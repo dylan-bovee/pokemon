@@ -13,7 +13,6 @@ class CaptureSystem:
         if self.target_pokemon.current_hp == 0:
             return False, "Le Pokémon est déjà K.O. !"
 
-        # Calcul de la probabilité de capture (max 60% quand PV = 0)
         capture_chance = (1 - (self.target_pokemon.current_hp / self.target_pokemon.hp)) * 0.6
         if random.random() < capture_chance:
             return True, f"{self.target_pokemon.name} capturé !"
@@ -28,12 +27,12 @@ class CaptureSystem:
             with open(filename, "r") as file:
                 data = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
-            data = {"pokemons_captures": []}  # Créer une liste vide si le fichier n'existe pas
+            data = {"pokemons_captures": []}  
 
-        data["pokemons_captures"].append(pokemon_name)  # Ajouter le Pokémon
+        data["pokemons_captures"].append(pokemon_name)
 
         with open(filename, "w") as file:
-            json.dump(data, file, indent=4)  # Sauvegarder
+            json.dump(data, file, indent=4)  
 
         print(f"{pokemon_name} a été ajouté à {filename} !")
 
@@ -50,9 +49,9 @@ class CaptureSystem:
         """Gère la tentative de capture et stocke le message."""
         success, message = self.attempt_capture()
         self.message = message
-        self.message_timer = pygame.time.get_ticks() + 2000  # Affiche pendant 2 secondes
+        self.message_timer = pygame.time.get_ticks() + 2000  
 
         if success:
-            self.save_capture(self.target_pokemon.name)  # Sauvegarde la capture
+            self.save_capture(self.target_pokemon.name)  
 
         return success

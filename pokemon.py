@@ -9,7 +9,7 @@ class Pokemon:
 
         if self.data:
             self.id = self.data["id"]
-            self.types = self.data["type"]
+            self.types = self.data["types"]  # Correction ici
             self.hp = self.data["hp"]
             self.attack = self.data["attack"]
             self.sprite_url = self.data["sprite"]
@@ -27,7 +27,7 @@ class Pokemon:
             return {
                 "name": data["name"].capitalize(),
                 "id": data["id"],
-                "type": [t["type"]["name"] for t in data["types"]],
+                "types": [t["type"]["name"] for t in data["types"]],  # Correction ici
                 "hp": data["stats"][0]["base_stat"],
                 "attack": data["stats"][1]["base_stat"],
                 "sprite": data["sprites"]["back_default"] if back_sprite else data["sprites"]["front_default"]
@@ -35,7 +35,21 @@ class Pokemon:
         return None
 
     def _load_sprite(self):
+        if not self.sprite_url:  # Vérification ajoutée pour éviter une erreur si l'URL est None
+            return pygame.Surface((64, 64))  # Image vide pour éviter les erreurs
         response = requests.get(self.sprite_url)
         sprite = pygame.image.load(io.BytesIO(response.content))
         width, height = sprite.get_size()
         return pygame.transform.scale(sprite, (width * 2, height * 2))
+
+    def take_damage(self, damage):
+        self.current_hp -= damage
+        print(f"{self.name} subit {damage} dégâts !")
+        if self.current_hp <= 0:
+            self.current_hp = 0
+            print(f"{self.name} est K.O. !")
+
+    def calculate_damage(self, opponent):
+        damage = max(5, self.attack - opponent.attack // 2)
+        print(f"{self.name} attaque {opponent.name} et inflige {damage} dégâts !")
+        return damage
