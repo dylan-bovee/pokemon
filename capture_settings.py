@@ -14,7 +14,7 @@ class CaptureSystem:
             return False, "Le Pokémon est déjà K.O. !"
 
         # Calcul de la probabilité de capture (max 60% quand PV = 0)
-        capture_chance = 0.3
+        capture_chance = (1 - (self.target_pokemon.current_hp / self.target_pokemon.hp)) * 0.6
         if random.random() < capture_chance:
             return True, f"{self.target_pokemon.name} capturé !"
         else:
