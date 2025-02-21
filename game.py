@@ -2,6 +2,7 @@ import pygame
 import random
 from pokemon import Pokemon
 from capture_settings import CaptureSystem
+from pokeball_animation import PokeBallAnimation  # Import de l'animation de la Poké Ball
 
 class PokemonGame:
     def __init__(self):
@@ -26,8 +27,11 @@ class PokemonGame:
         # Gestion du tour et de l'interface
         self.is_player_turn = True
         self.running = True
-        self.menu_state = "choice"  # "choice" pour attaque/capture, "attack" pour attaque, "capture" pour capture
+        self.menu_state = "choice"
         self.message = "Que voulez-vous faire ?"
+
+        # Animation de la Poké Ball
+        self.pokeball_animation = None  
 
     def draw_pokemon_info(self, x, y, pokemon, level):
         """Affiche les informations d'un Pokémon avec une barre de vie."""
@@ -79,22 +83,21 @@ class PokemonGame:
         self.end_turn()
 
     def attempt_capture(self):
-        """Tente la capture et gère le message."""
-        success = self.capture_system.handle_capture()
-        if success:
-            self.running = False  # Quitter après capture réussie
+        """Tente la capture avec animation de la Poké Ball."""
+        self.pokeball_animation = PokeBallAnimation(self.screen, self.player_x + 50, self.player_y, self.opponent_x, self.opponent_y)
 
     def opponent_turn(self):
         """Gère l'attaque aléatoire de l'adversaire."""
-        attack_choice = random.choice([("Éclair", 12), ("Griffe", 8)])
-        self.message = f"{self.opponent_pokemon.name} utilise {attack_choice[0]} !"
-        self.player_pokemon.take_damage(attack_choice[1])
-        pygame.time.delay(500)
-        self.is_player_turn = True
-        self.menu_state = "choice"
+        if self.opponent_pokemon.current_hp > 0:
+            attack_choice = random.choice([("Éclair", 12), ("Griffe", 8)])
+            self.message = f"{self.opponent_pokemon.name} utilise {attack_choice[0]} !"
+            self.player_pokemon.take_damage(attack_choice[1])
+            pygame.time.delay(500)
+            self.is_player_turn = True
+            self.menu_state = "choice"
 
     def draw_scene(self):
-        """Dessine l'écran de jeu, y compris les Pokémon et les interfaces."""
+        """Dessine l'écran de jeu."""
         self.screen.fill((255, 255, 255))
         self.screen.blit(self.player_pokemon.sprite, (self.player_x, self.player_y))
         self.screen.blit(self.opponent_pokemon.sprite, (self.opponent_x, self.opponent_y))
@@ -109,8 +112,12 @@ class PokemonGame:
 
         self.capture_system.draw_message(self.screen, self.font)
 
+        # Dessiner l'animation de la Poké Ball si active
+        if self.pokeball_animation and self.pokeball_animation.active:
+            self.pokeball_animation.draw()
+
     def end_turn(self):
-        """Vérifie si le combat est terminé et passe au tour de l'adversaire si nécessaire."""
+        """Vérifie si le combat est terminé et passe au tour de l'adversaire."""
         if self.opponent_pokemon.current_hp == 0:
             self.message = f"{self.opponent_pokemon.name} est K.O. ! Vous gagnez !"
             self.running = False
@@ -127,6 +134,9 @@ class PokemonGame:
             self.draw_scene()
             pygame.display.update()
             
+            if self.pokeball_animation and self.pokeball_animation.active:
+                self.pokeball_animation.update()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -143,4 +153,7 @@ class PokemonGame:
                             self.attack("Flammèche", 15)
                         self.menu_state = "choice"
 
-        pygame.quit()
+
+if __name__ == "__main__":
+    game = PokemonGame()
+    game.run()
