@@ -1,5 +1,6 @@
 import pygame
 import random
+from game import PokemonGame
 
 # Initialisation de Pygame
 pygame.init()
@@ -7,7 +8,7 @@ pygame.init()
 # Dimensions de la fenêtre
 LARGEUR = 800
 HAUTEUR = 600
-fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR))
+fenetre = pygame.display.set_mode((LA&RGEUR, HAUTEUR))
 pygame.display.set_caption("Pokémon")
 
 # Charger l'image de la carte
@@ -103,6 +104,9 @@ while running:
                     if choix_dialogue == 0:
                         fondu_noir()
                         print("⚔️ Combat contre un Pokémon sauvage !")
+                        combat = PokemonGame()
+                        combat.run()  # Le combat commence ici
+                        print("Retour à l'exploration")
                     dans_dialogue = False
                     sorti_zone_combat = False  # On empêche le dialogue de réapparaître immédiatement
     
